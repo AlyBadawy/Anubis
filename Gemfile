@@ -4,6 +4,7 @@ gem "bootsnap", require: false # Reduces boot times through caching; required in
 gem "kamal", require: false
 gem "pg"
 gem "puma", ">= 5.0"
+gem "rack-cors"
 gem "rails", "~> 8.0.2"
 gem "solid_cable"
 gem "solid_cache"
