@@ -1,6 +1,7 @@
 source "https://rubygems.org"
 
 gem "bootsnap", require: false # Reduces boot times through caching; required in config/boot.rb
+gem "jbuilder"
 gem "kamal", require: false
 gem "pg"
 gem "puma", ">= 5.0"
