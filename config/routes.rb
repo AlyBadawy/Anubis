@@ -1,6 +1,9 @@
 Rails.application.routes.draw do
   scope "/api", defaults: { format: :json } do
-    resources :roles
+    scope "/admin" do
+      resources :roles
+      resources :users
+    end
   end
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.

@@ -1,5 +1,6 @@
 source "https://rubygems.org"
 
+gem "bcrypt"
 gem "bootsnap", require: false # Reduces boot times through caching; required in config/boot.rb
 gem "jbuilder"
 gem "kamal", require: false
