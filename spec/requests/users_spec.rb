@@ -41,7 +41,7 @@ RSpec.describe "/users", type: :request do
       expect(response).to be_successful
     end
 
-    it "doesn't renders password_digest in the user object" do
+    it "does not render password_digest in the user object" do
       user = User.create! valid_attributes
       get user_url(user), as: :json
       response_body = JSON.parse(response.body)
