@@ -12,7 +12,6 @@ class RoleAssignmentsController < ApplicationController
       render json: { error: "Role not found" }, status: :unprocessable_entity
       return
     end
-    # Check if the role is already assigned to the user
     if @user.roles.exists?(role.id)
       render json: { error: "Role already assigned to user" }, status: :unprocessable_entity
       return
@@ -33,12 +32,22 @@ class RoleAssignmentsController < ApplicationController
   # DELETE /roles/unassign
   # DELETE /roles/unassign.json
   def destroy
+    @user = User.find_by(id: role_assignment_params[:user_id]) # Ensure the user exists
+    role = Role.find_by(id: role_assignment_params[:role_id]) # Ensure the role exists
+    if @user.nil?
+      render json: { error: "User not found" }, status: :unprocessable_entity
+      return
+    end
+    if role.nil?
+      render json: { error: "Role not found" }, status: :unprocessable_entity
+      return
+    end
     @role_assignment = RoleAssignment.find_by(role_assignment_params)
     if @role_assignment
       @role_assignment.destroy!
-      head :no_content
+      render :show, status: :ok
     else
-      render json: { error: "Role assignment not found" }, status: :not_found
+      render json: { error: "Role is not assigned to user" }, status: :unprocessable_entity
     end
   end
 

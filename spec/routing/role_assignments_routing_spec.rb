@@ -9,7 +9,7 @@ RSpec.describe RoleAssignmentsController, type: :routing do
     end
 
     it "routes to #destroy" do
-      expect(delete: "/api/admin/role_assignments/unassign").to route_to("role_assignments#destroy", format: default_format)
+      expect(delete: "/api/admin/role_assignments/revoke").to route_to("role_assignments#destroy", format: default_format)
     end
   end
 end
