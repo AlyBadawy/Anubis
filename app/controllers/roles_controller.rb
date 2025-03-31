@@ -44,6 +44,6 @@ class RolesController < ApplicationController
 
   # Only allow a list of trusted parameters through.
   def role_params
-    params.expect(role: [:role_name])
+    params.expect(role: [:role_name, :hide_from_profile])
   end
 end
