@@ -38,6 +38,9 @@ RSpec.describe "/role_assignments", type: :request do
              params: { role_assignment: valid_attributes }, headers: valid_headers, as: :json
         expect(response).to have_http_status(:created)
         expect(response.content_type).to match(a_string_including("application/json"))
+        res_body = JSON.parse(response.body)
+        expect(res_body["id"]).to eq(user.id)
+        expect(res_body["roles"].first["id"]).to eq(role.id)
       end
     end
 
@@ -49,11 +52,86 @@ RSpec.describe "/role_assignments", type: :request do
         }.not_to change(RoleAssignment, :count)
       end
 
-      xit "renders a JSON response with errors for the new role_assignment" do # rubocop:disable RSpec/PendingWithoutReason
+      it "renders a JSON response with errors for the new role_assignment" do # rubocop:disable RSpec/PendingWithoutReason
         post role_assignments_assign_url,
              params: { role_assignment: invalid_attributes }, headers: valid_headers, as: :json
         expect(response).to have_http_status(:unprocessable_entity)
         expect(response.content_type).to match(a_string_including("application/json"))
+      end
+
+      context "when user_id is nil" do
+        it "returns an error" do
+          post role_assignments_assign_url,
+               params: { role_assignment: invalid_attributes }, headers: valid_headers, as: :json
+          expect(response).to have_http_status(:unprocessable_entity)
+          expect(response.content_type).to match(a_string_including("application/json"))
+          expect(JSON.parse(response.body)["error"]).to include("User not found")
+        end
+      end
+
+      context "when role_id is nil" do
+        let(:invalid_attributes) {
+          {
+            role_id: nil,
+            user_id: user.id,
+          }
+        }
+
+        it "returns an error" do
+          post role_assignments_assign_url,
+               params: { role_assignment: invalid_attributes }, headers: valid_headers, as: :json
+          expect(response).to have_http_status(:unprocessable_entity)
+          expect(response.content_type).to match(a_string_including("application/json"))
+          expect(JSON.parse(response.body)["error"]).to include("Role not found")
+        end
+      end
+
+      context "when role_id is not a valid role" do
+        let(:invalid_attributes) {
+          {
+            role_id: 9999,
+            user_id: user.id,
+          }
+        }
+
+        it "returns an error" do
+          post role_assignments_assign_url,
+               params: { role_assignment: invalid_attributes }, headers: valid_headers, as: :json
+          expect(response).to have_http_status(:unprocessable_entity)
+          expect(response.content_type).to match(a_string_including("application/json"))
+          expect(JSON.parse(response.body)["error"]).to include("Role not found")
+        end
+      end
+
+      context "when user_id is not a valid user" do
+        let(:invalid_attributes) {
+          {
+            role_id: role.id,
+            user_id: 9999,
+          }
+        }
+
+        it "returns an error" do
+          post role_assignments_assign_url,
+               params: { role_assignment: invalid_attributes }, headers: valid_headers, as: :json
+          expect(response).to have_http_status(:unprocessable_entity)
+          expect(response.content_type).to match(a_string_including("application/json"))
+          expect(JSON.parse(response.body)["error"]).to include("User not found")
+        end
+      end
+
+      context "when role is already assigned to user" do
+        before do
+          RoleAssignment.create!(valid_attributes)
+        end
+
+        it "returns an error" do
+          post role_assignments_assign_url,
+               params: { role_assignment: valid_attributes }, headers: valid_headers, as: :json
+          expect(response).to have_http_status(:unprocessable_entity)
+          expect(response.content_type).to match(a_string_including("application/json"))
+          expect(JSON.parse(response.body)["error"]).to include("Role already assigned to user")
+        end
       end
     end
   end

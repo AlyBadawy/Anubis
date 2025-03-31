@@ -1,1 +1,1 @@
-json.partial! "role_assignments/role_assignment", role_assignment: @role_assignment
+json.partial! "users/user", user: @user
