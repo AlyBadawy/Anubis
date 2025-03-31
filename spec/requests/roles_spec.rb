@@ -2,7 +2,10 @@ require "rails_helper"
 
 RSpec.describe "/admin/roles", type: :request do
   let(:valid_attributes) {
-    { role_name: "Admin" }
+    {
+      role_name: "Admin",
+      hide_from_profile: true,
+    }
   }
 
   let(:invalid_attributes) {
@@ -39,6 +42,9 @@ RSpec.describe "/admin/roles", type: :request do
              params: { role: valid_attributes }, headers: @valid_headers, as: :json
         expect(response).to have_http_status(:created)
         expect(response.content_type).to match(a_string_including("application/json"))
+        res_body = JSON.parse(response.body)
+        expect(res_body["role_name"]).to eq("Admin")
+        expect(res_body["hide_from_profile"]).to be(true)
       end
     end
 
@@ -62,7 +68,10 @@ RSpec.describe "/admin/roles", type: :request do
   describe "PATCH /update" do
     context "with valid parameters" do
       let(:new_attributes) {
-        { role_name: "User" }
+        {
+          role_name: "User",
+          hide_from_profile: false,
+        }
       }
 
       it "updates the requested role" do
@@ -71,6 +80,7 @@ RSpec.describe "/admin/roles", type: :request do
               params: { role: new_attributes }, headers: @valid_headers, as: :json
         role.reload
         expect(role.role_name).to eq("User")
+        expect(role.hide_from_profile).to be(false)
       end
 
       it "renders a JSON response with the role" do
