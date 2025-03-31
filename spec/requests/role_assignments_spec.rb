@@ -240,7 +240,7 @@ RSpec.describe "/role_assignments", type: :request do
                  params: { role_assignment: valid_attributes }, headers: valid_headers, as: :json
           expect(response).to have_http_status(:unprocessable_entity)
           expect(response.content_type).to match(a_string_including("application/json"))
-          expect(JSON.parse(response.body)["error"]).to include("Role is not assigned to use")
+          expect(JSON.parse(response.body)["error"]).to include("Role is not assigned to user")
         end
       end
     end
