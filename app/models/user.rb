@@ -40,4 +40,7 @@ class User < ApplicationRecord
   validates :bio,
             length: { maximum: 1000 },
             allow_blank: true
+
+  has_many :role_assignments, dependent: :destroy
+  has_many :roles, through: :role_assignments
 end

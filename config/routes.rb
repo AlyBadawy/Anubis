@@ -1,8 +1,12 @@
 Rails.application.routes.draw do
   scope "/api", defaults: { format: :json } do
     scope "/admin" do
-      resources :roles
       resources :users
+      resources :roles
+      namespace :role_assignments do
+        post "assign", action: :create
+        delete "unassign", action: :destroy
+      end
     end
   end
 

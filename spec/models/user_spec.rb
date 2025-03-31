@@ -60,6 +60,7 @@ RSpec.describe User, type: :model do
   end
 
   describe "Associations" do
-    pending "All associations are tested in the respective model spec files"
+    it { is_expected.to have_many(:role_assignments).dependent(:destroy) }
+    it { is_expected.to have_many(:roles).through(:role_assignments) }
   end
 end
