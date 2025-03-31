@@ -4,8 +4,12 @@ class RoleAssignmentsController < ApplicationController
   def create
     @user = User.find_by(id: role_assignment_params[:user_id]) # Ensure the user exists
     role = Role.find_by(id: role_assignment_params[:role_id]) # Ensure the role exists
-    if @user.nil? || role.nil?
-      render json: { error: "User or Role not found" }, status: :unprocessable_entity
+    if @user.nil?
+      render json: { error: "User not found" }, status: :unprocessable_entity
+      return
+    end
+    if role.nil?
+      render json: { error: "Role not found" }, status: :unprocessable_entity
       return
     end
     # Check if the role is already assigned to the user

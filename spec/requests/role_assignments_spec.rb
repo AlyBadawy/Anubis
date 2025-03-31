@@ -38,8 +38,9 @@ RSpec.describe "/role_assignments", type: :request do
              params: { role_assignment: valid_attributes }, headers: valid_headers, as: :json
         expect(response).to have_http_status(:created)
         expect(response.content_type).to match(a_string_including("application/json"))
-        expect(JSON.parse(response.body)["id"]).to eq(user.id)
-        expect(JSON.parse(response.body)["roles"].first["id"]).to eq(role.id)
+        res_body = JSON.parse(response.body)
+        expect(res_body["id"]).to eq(user.id)
+        expect(res_body["roles"].first["id"]).to eq(role.id)
       end
     end
 
@@ -64,7 +65,7 @@ RSpec.describe "/role_assignments", type: :request do
                params: { role_assignment: invalid_attributes }, headers: valid_headers, as: :json
           expect(response).to have_http_status(:unprocessable_entity)
           expect(response.content_type).to match(a_string_including("application/json"))
-          expect(JSON.parse(response.body)["error"]).to include("User or Role not found")
+          expect(JSON.parse(response.body)["error"]).to include("User not found")
         end
       end
 
@@ -81,7 +82,7 @@ RSpec.describe "/role_assignments", type: :request do
                params: { role_assignment: invalid_attributes }, headers: valid_headers, as: :json
           expect(response).to have_http_status(:unprocessable_entity)
           expect(response.content_type).to match(a_string_including("application/json"))
-          expect(JSON.parse(response.body)["error"]).to include("User or Role not found")
+          expect(JSON.parse(response.body)["error"]).to include("Role not found")
         end
       end
 
@@ -98,7 +99,7 @@ RSpec.describe "/role_assignments", type: :request do
                params: { role_assignment: invalid_attributes }, headers: valid_headers, as: :json
           expect(response).to have_http_status(:unprocessable_entity)
           expect(response.content_type).to match(a_string_including("application/json"))
-          expect(JSON.parse(response.body)["error"]).to include("User or Role not found")
+          expect(JSON.parse(response.body)["error"]).to include("Role not found")
         end
       end
 
@@ -115,7 +116,7 @@ RSpec.describe "/role_assignments", type: :request do
                params: { role_assignment: invalid_attributes }, headers: valid_headers, as: :json
           expect(response).to have_http_status(:unprocessable_entity)
           expect(response.content_type).to match(a_string_including("application/json"))
-          expect(JSON.parse(response.body)["error"]).to include("User or Role not found")
+          expect(JSON.parse(response.body)["error"]).to include("User not found")
         end
       end
 
