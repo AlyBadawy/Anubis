@@ -12,8 +12,8 @@ class RoleAssignmentsController < ApplicationController
     end
   end
 
-  # POST /roles/unassign
-  # POST /roles/unassign.json
+  # DELETE /roles/unassign
+  # DELETE /roles/unassign.json
   def destroy
     @role_assignment = RoleAssignment.find_by(role_assignment_params)
     if @role_assignment
