@@ -5,7 +5,7 @@ Rails.application.routes.draw do
       resources :roles
       namespace :role_assignments do
         post "assign", action: :create
-        delete "unassign", action: :destroy
+        delete "revoke", action: :destroy
       end
     end
   end
