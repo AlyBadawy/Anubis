@@ -20,7 +20,7 @@ class RoleAssignmentsController < ApplicationController
       @role_assignment.destroy!
       head :no_content
     else
-      render json: { error: 'Role assignment not found' }, status: :not_found
+      render json: { error: "Role assignment not found" }, status: :not_found
     end
   end
 
