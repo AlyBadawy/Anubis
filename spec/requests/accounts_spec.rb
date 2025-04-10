@@ -1,6 +1,31 @@
 require "rails_helper"
 
 RSpec.describe "/profiles/", type: :request do
+  let(:valid_attributes) {
+    {
+      email_address: "test@example.com",
+      password: "password",
+      password_confirmation: "password",
+      username: "test",
+      first_name: "Test",
+      last_name: "User",
+      phone: "1234567890",
+      bio: "Test user",
+    }
+  }
+
+  let(:invalid_attributes) {
+    {
+      email_address: "test@example.com",
+      password: "password",
+      password_confirmation: "invalid",
+    }
+  }
+
+  let(:valid_headers) {
+    {}
+  }
+
   describe "GET /:username" do
     context "when username exists" do
       it "renders a successful response" do
@@ -44,6 +69,40 @@ RSpec.describe "/profiles/", type: :request do
         expected_keys = ["error"]
         expect(res_body.keys).to include(*expected_keys)
         expect(res_body["error"]).to eq("User not found")
+      end
+    end
+  end
+
+  describe "POST /register" do
+    context "with valid parameters" do
+      it "creates a new User" do
+        expect {
+          post register_url,
+               params: { user: valid_attributes }, headers: valid_headers, as: :json
+        }.to change(User, :count).by(1)
+      end
+
+      it "renders a JSON response with the new user" do
+        post register_url,
+             params: { user: valid_attributes }, headers: valid_headers, as: :json
+        expect(response).to have_http_status(:created)
+        expect(response.content_type).to match(a_string_including("application/json"))
+      end
+    end
+
+    context "with invalid parameters" do
+      it "does not create a new User" do
+        expect {
+          post register_url,
+               params: { user: invalid_attributes }, as: :json
+        }.not_to change(User, :count)
+      end
+
+      it "renders a JSON response with errors for the new user" do
+        post register_url,
+             params: { user: invalid_attributes }, headers: valid_headers, as: :json
+        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response.content_type).to match(a_string_including("application/json"))
       end
     end
   end
