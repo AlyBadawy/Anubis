@@ -3,6 +3,7 @@ source "https://rubygems.org"
 gem "bcrypt"
 gem "bootsnap", require: false # Reduces boot times through caching; required in config/boot.rb
 gem "jbuilder"
+gem "jwt"
 gem "kamal", require: false
 gem "pg"
 gem "puma", ">= 5.0"
