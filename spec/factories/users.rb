@@ -5,7 +5,7 @@ FactoryBot.define do
     first_name { Faker::Name.first_name }
     last_name { Faker::Name.last_name }
     phone { Faker::PhoneNumber.cell_phone }
-    username { Faker::Internet.username }
+    username { Faker::Internet.username(specifier: 3..20) }
     bio { Faker::Lorem.paragraph }
   end
 end
