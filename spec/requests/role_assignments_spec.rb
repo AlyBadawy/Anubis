@@ -29,13 +29,13 @@ RSpec.describe "/role_assignments", type: :request do
       it "creates a new RoleAssignment" do
         expect {
           post role_assignments_assign_url,
-               params: { role_assignment: valid_attributes }, headers: valid_headers, as: :json
+               params: { role_assignment: valid_attributes }, headers: @valid_headers, as: :json
         }.to change(RoleAssignment, :count).by(1)
       end
 
       it "renders a JSON response with the user object" do
         post role_assignments_assign_url,
-             params: { role_assignment: valid_attributes }, headers: valid_headers, as: :json
+             params: { role_assignment: valid_attributes }, headers: @valid_headers, as: :json
         expect(response).to have_http_status(:created)
         expect(response.content_type).to match(a_string_including("application/json"))
         res_body = JSON.parse(response.body)
@@ -54,7 +54,7 @@ RSpec.describe "/role_assignments", type: :request do
 
       it "renders a JSON response with errors for the new role_assignment" do # rubocop:disable RSpec/PendingWithoutReason
         post role_assignments_assign_url,
-             params: { role_assignment: invalid_attributes }, headers: valid_headers, as: :json
+             params: { role_assignment: invalid_attributes }, headers: @valid_headers, as: :json
         expect(response).to have_http_status(:unprocessable_entity)
         expect(response.content_type).to match(a_string_including("application/json"))
       end
@@ -62,7 +62,7 @@ RSpec.describe "/role_assignments", type: :request do
       context "when user_id is nil" do
         it "returns an error" do
           post role_assignments_assign_url,
-               params: { role_assignment: invalid_attributes }, headers: valid_headers, as: :json
+               params: { role_assignment: invalid_attributes }, headers: @valid_headers, as: :json
           expect(response).to have_http_status(:unprocessable_entity)
           expect(response.content_type).to match(a_string_including("application/json"))
           expect(JSON.parse(response.body)["error"]).to include("User not found")
@@ -79,7 +79,7 @@ RSpec.describe "/role_assignments", type: :request do
 
         it "returns an error" do
           post role_assignments_assign_url,
-               params: { role_assignment: invalid_attributes }, headers: valid_headers, as: :json
+               params: { role_assignment: invalid_attributes }, headers: @valid_headers, as: :json
           expect(response).to have_http_status(:unprocessable_entity)
           expect(response.content_type).to match(a_string_including("application/json"))
           expect(JSON.parse(response.body)["error"]).to include("Role not found")
@@ -96,7 +96,7 @@ RSpec.describe "/role_assignments", type: :request do
 
         it "returns an error" do
           post role_assignments_assign_url,
-               params: { role_assignment: invalid_attributes }, headers: valid_headers, as: :json
+               params: { role_assignment: invalid_attributes }, headers: @valid_headers, as: :json
           expect(response).to have_http_status(:unprocessable_entity)
           expect(response.content_type).to match(a_string_including("application/json"))
           expect(JSON.parse(response.body)["error"]).to include("Role not found")
@@ -113,7 +113,7 @@ RSpec.describe "/role_assignments", type: :request do
 
         it "returns an error" do
           post role_assignments_assign_url,
-               params: { role_assignment: invalid_attributes }, headers: valid_headers, as: :json
+               params: { role_assignment: invalid_attributes }, headers: @valid_headers, as: :json
           expect(response).to have_http_status(:unprocessable_entity)
           expect(response.content_type).to match(a_string_including("application/json"))
           expect(JSON.parse(response.body)["error"]).to include("User not found")
@@ -127,7 +127,7 @@ RSpec.describe "/role_assignments", type: :request do
 
         it "returns an error" do
           post role_assignments_assign_url,
-               params: { role_assignment: valid_attributes }, headers: valid_headers, as: :json
+               params: { role_assignment: valid_attributes }, headers: @valid_headers, as: :json
           expect(response).to have_http_status(:unprocessable_entity)
           expect(response.content_type).to match(a_string_including("application/json"))
           expect(JSON.parse(response.body)["error"]).to include("Role already assigned to user")
@@ -142,14 +142,14 @@ RSpec.describe "/role_assignments", type: :request do
         RoleAssignment.create! valid_attributes
         expect {
           delete role_assignments_revoke_url,
-                 params: { role_assignment: valid_attributes }, headers: valid_headers, as: :json
+                 params: { role_assignment: valid_attributes }, headers: @valid_headers, as: :json
         }.to change(RoleAssignment, :count).by(-1)
       end
 
       it "renders a JSON response with the user object" do
         RoleAssignment.create! valid_attributes
         delete role_assignments_revoke_url,
-               params: { role_assignment: valid_attributes }, headers: valid_headers, as: :json
+               params: { role_assignment: valid_attributes }, headers: @valid_headers, as: :json
         expect(response).to have_http_status(:ok)
         expect(response.content_type).to match(a_string_including("application/json"))
         res_body = JSON.parse(response.body)
@@ -168,7 +168,7 @@ RSpec.describe "/role_assignments", type: :request do
 
       it "renders a JSON response with errors for the new role_assignment" do # rubocop:disable RSpec/PendingWithoutReason
         delete role_assignments_revoke_url,
-               params: { role_assignment: invalid_attributes }, headers: valid_headers, as: :json
+               params: { role_assignment: invalid_attributes }, headers: @valid_headers, as: :json
         expect(response).to have_http_status(:unprocessable_entity)
         expect(response.content_type).to match(a_string_including("application/json"))
       end
@@ -176,7 +176,7 @@ RSpec.describe "/role_assignments", type: :request do
       context "when user_id is nil" do
         it "returns an error" do
           delete role_assignments_revoke_url,
-                 params: { role_assignment: invalid_attributes }, headers: valid_headers, as: :json
+                 params: { role_assignment: invalid_attributes }, headers: @valid_headers, as: :json
           expect(response).to have_http_status(:unprocessable_entity)
           expect(response.content_type).to match(a_string_including("application/json"))
           expect(JSON.parse(response.body)["error"]).to include("User not found")
@@ -193,7 +193,7 @@ RSpec.describe "/role_assignments", type: :request do
 
         it "returns an error" do
           delete role_assignments_revoke_url,
-                 params: { role_assignment: invalid_attributes }, headers: valid_headers, as: :json
+                 params: { role_assignment: invalid_attributes }, headers: @valid_headers, as: :json
           expect(response).to have_http_status(:unprocessable_entity)
           expect(response.content_type).to match(a_string_including("application/json"))
           expect(JSON.parse(response.body)["error"]).to include("Role not found")
@@ -210,7 +210,7 @@ RSpec.describe "/role_assignments", type: :request do
 
         it "returns an error" do
           delete role_assignments_revoke_url,
-                 params: { role_assignment: invalid_attributes }, headers: valid_headers, as: :json
+                 params: { role_assignment: invalid_attributes }, headers: @valid_headers, as: :json
           expect(response).to have_http_status(:unprocessable_entity)
           expect(response.content_type).to match(a_string_including("application/json"))
           expect(JSON.parse(response.body)["error"]).to include("Role not found")
@@ -227,7 +227,7 @@ RSpec.describe "/role_assignments", type: :request do
 
         it "returns an error" do
           delete role_assignments_revoke_url,
-                 params: { role_assignment: invalid_attributes }, headers: valid_headers, as: :json
+                 params: { role_assignment: invalid_attributes }, headers: @valid_headers, as: :json
           expect(response).to have_http_status(:unprocessable_entity)
           expect(response.content_type).to match(a_string_including("application/json"))
           expect(JSON.parse(response.body)["error"]).to include("User not found")
@@ -237,7 +237,7 @@ RSpec.describe "/role_assignments", type: :request do
       context "when role is not already assigned to user" do
         it "returns an error" do
           delete role_assignments_revoke_url,
-                 params: { role_assignment: valid_attributes }, headers: valid_headers, as: :json
+                 params: { role_assignment: valid_attributes }, headers: @valid_headers, as: :json
           expect(response).to have_http_status(:unprocessable_entity)
           expect(response.content_type).to match(a_string_including("application/json"))
           expect(JSON.parse(response.body)["error"]).to include("Role is not assigned to user")

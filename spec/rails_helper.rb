@@ -33,4 +33,12 @@ RSpec.configure do |config|
       with.library :rails
     end
   end
+
+  config.before(:each) do
+    @signed_in_user = create(:user)
+    @signed_in_session = create(:session, user: @signed_in_user)
+    @valid_token = JwtHelper.encode(@signed_in_session)
+    @valid_headers = { "Authorization" => "Bearer #{@valid_token}" }
+    @invalid_headers = { "Authorization" => "Bearer bad_token" }
+  end
 end

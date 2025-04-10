@@ -78,13 +78,13 @@ RSpec.describe "/profiles/", type: :request do
       it "creates a new User" do
         expect {
           post register_url,
-               params: { user: valid_attributes }, headers: valid_headers, as: :json
+               params: { user: valid_attributes }, headers: @valid_headers, as: :json
         }.to change(User, :count).by(1)
       end
 
       it "renders a JSON response with the new user" do
         post register_url,
-             params: { user: valid_attributes }, headers: valid_headers, as: :json
+             params: { user: valid_attributes }, headers: @valid_headers, as: :json
         expect(response).to have_http_status(:created)
         expect(response.content_type).to match(a_string_including("application/json"))
       end
@@ -100,7 +100,7 @@ RSpec.describe "/profiles/", type: :request do
 
       it "renders a JSON response with errors for the new user" do
         post register_url,
-             params: { user: invalid_attributes }, headers: valid_headers, as: :json
+             params: { user: invalid_attributes }, headers: @valid_headers, as: :json
         expect(response).to have_http_status(:unprocessable_entity)
         expect(response.content_type).to match(a_string_including("application/json"))
       end
