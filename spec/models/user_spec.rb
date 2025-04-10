@@ -62,5 +62,6 @@ RSpec.describe User, type: :model do
   describe "Associations" do
     it { is_expected.to have_many(:role_assignments).dependent(:destroy) }
     it { is_expected.to have_many(:roles).through(:role_assignments) }
+    it { is_expected.to have_many(:sessions).dependent(:destroy) }
   end
 end

@@ -43,4 +43,6 @@ class User < ApplicationRecord
 
   has_many :role_assignments, dependent: :destroy
   has_many :roles, through: :role_assignments
+
+  has_many :sessions, dependent: :destroy
 end

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_03_31_163148) do
+ActiveRecord::Schema[8.0].define(version: 2025_04_10_132017) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -32,6 +32,20 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_31_163148) do
     t.index ["role_name"], name: "index_roles_on_role_name", unique: true
   end
 
+  create_table "sessions", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "user_id", null: false
+    t.string "ip_address", null: false
+    t.string "user_agent", null: false
+    t.string "refresh_token", null: false
+    t.integer "refresh_count", default: 0
+    t.datetime "last_refreshed_at"
+    t.datetime "refresh_token_expires_at"
+    t.boolean "revoked", default: false, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_sessions_on_user_id"
+  end
+
   create_table "users", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.string "email_address", null: false
     t.string "password_digest", null: false
@@ -48,4 +62,5 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_31_163148) do
 
   add_foreign_key "role_assignments", "roles"
   add_foreign_key "role_assignments", "users"
+  add_foreign_key "sessions", "users"
 end
