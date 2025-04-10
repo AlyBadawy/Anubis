@@ -29,19 +29,19 @@ RSpec.describe "/profiles/", type: :request do
   describe "GET /:username" do
     context "when username exists" do
       it "renders a successful response" do
-        username = create(:user).username
-        get profile_by_username_url(username), as: :json, headers: @valid_headers
+        create(:user, username: "testUser")
+        get profile_by_username_url("testUser"), as: :json, headers: @valid_headers
+        expect(response.content_type).to match(a_string_including("application/json"))
         expect(response).to be_successful
       end
 
       it "renders the user profile" do
-        username = create(:user).username
-        get profile_by_username_url(username), as: :json, headers: @valid_headers
-        expect(response.content_type).to match(a_string_including("application/json"))
+        create(:user, username: "testUser2")
+        get profile_by_username_url("testUser2"), as: :json, headers: @valid_headers
         res_body = JSON.parse(response.body)
         expected_keys = ["id", "first_name", "last_name", "phone", "username", "bio", "roles", "created_at", "updated_at", "url"]
         expect(res_body.keys).to include(*expected_keys)
-        expect(res_body["username"]).to eq(username)
+        expect(res_body["username"]).to eq("testUser2")
         expect(res_body["roles"]).to be_an(Array)
         expect(res_body["roles"].length).to eq(0)
       end
