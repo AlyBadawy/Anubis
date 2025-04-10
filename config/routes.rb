@@ -1,16 +1,18 @@
 Rails.application.routes.draw do
   scope "/api", defaults: { format: :json } do
     scope "/admin" do
-      resources :users
-      resources :roles
-      namespace :role_assignments do
-        post "assign", action: :create
-        delete "revoke", action: :destroy
+      constraints AdminConstraint.new do
+        resources :users
+        resources :roles
+        namespace :role_assignments do
+          post "assign", action: :create
+          delete "revoke", action: :destroy
+        end
       end
     end
 
     scope "accounts" do
-      # get "me", to: "accounts#me", as: :me
+      get "me", to: "accounts#me", as: :me
       get "profile/:username", to: "accounts#show", as: :profile_by_username
       post "register", to: "accounts#register", as: :register
       # post "update_profile", to: "accounts#update_profile"
