@@ -4,6 +4,10 @@ RSpec.describe AccountsController, type: :routing do
   let(:default_format) { :json }
 
   describe "routing" do
+    it "routes to #me" do
+      expect(get: "/api/accounts/me").to route_to("accounts#me", format: default_format)
+    end
+
     it "routes to #show" do
       expect(get: "/api/accounts/profile/cool_user").to route_to("accounts#show", username: "cool_user", format: default_format)
     end

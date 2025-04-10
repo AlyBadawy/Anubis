@@ -1,4 +1,10 @@
 class AccountsController < ApplicationController
+  def me
+    @user = Current.user
+
+    render :show, status: :ok, location: @user
+  end
+
   def show
     @user = User.find_by(username: params.expect(:username))
     render_user_profile

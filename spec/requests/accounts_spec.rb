@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe "/profiles/", type: :request do
+RSpec.describe "accounts/", type: :request do
   let(:valid_attributes) {
     {
       email_address: "test@example.com",
@@ -22,11 +22,47 @@ RSpec.describe "/profiles/", type: :request do
     }
   }
 
-  let(:valid_headers) {
-    {}
-  }
+  describe "GET '/me'" do
+    context "when user is logged in" do
+      it "returns a successful response" do
+        get me_url, headers: @valid_headers
+        expect(response).to have_http_status(:ok)
+      end
 
-  describe "GET /:username" do
+      it "returns the current user" do
+        get me_url, headers: @valid_headers
+        res_body = JSON.parse(response.body)
+        expected_keys = ["id", "first_name", "last_name", "phone", "username", "bio", "roles", "created_at", "updated_at", "url"]
+        expect(res_body.keys).to include(*expected_keys)
+        expect(res_body["username"]).to eq(@signed_in_user.username)
+        expect(res_body["roles"]).to be_an(Array)
+        expect(res_body["roles"].length).to eq(0)
+      end
+    end
+
+    context "when the user is not logged in" do
+      it "returns an unauthorized response" do
+        get me_url, headers: @invalid_headers
+        expect(response).to have_http_status(:unauthorized)
+      end
+
+      it "returns an error message" do
+        get me_url, headers: @invalid_headers
+        res_body = JSON.parse(response.body)
+        expect(res_body["error"]).to eq("Invalid token: Invalid segment encoding")
+      end
+
+      it "does not return the user profile" do
+        get me_url, headers: @invalid_headers
+        res_body = JSON.parse(response.body)
+        expected_keys = ["error"]
+        expect(res_body.keys).to include(*expected_keys)
+        expect(res_body["error"]).to eq("Invalid token: Invalid segment encoding")
+      end
+    end
+  end
+
+  describe "GET 'profile/:username'" do
     context "when username exists" do
       it "renders a successful response" do
         create(:user, username: "testUser")
