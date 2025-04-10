@@ -11,7 +11,7 @@ Rails.application.routes.draw do
 
     scope "accounts" do
       # get "current", to: "accounts#current"
-      # get "profile", to: "accounts#show", param: :username
+      get "profile/:username", to: "accounts#show", as: :profile_by_username
       # post "login", to: "accounts#login"
       # post "logout", to: "accounts#logout"
       # post "register", to: "accounts#register"
