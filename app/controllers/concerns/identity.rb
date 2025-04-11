@@ -14,17 +14,9 @@ module Identity
   private
 
   def authenticate_user!
-    auth_header = request.headers["Authorization"]
-    if auth_header.present? && auth_header.start_with?("Bearer ")
-      token = auth_header.split(" ").last
-      begin
-        decoded_token = JwtHelper.decode(token)
-        Current.session = Session.find_by!(id: decoded_token["jti"], revoked: false)
-      rescue JWT::DecodeError, ActiveRecord::RecordNotFound => e
-        render status: :unauthorized, json: { error: "Invalid token: #{e.message}" }
-      end
-    else
-      render status: :unauthorized, json: { error: "Missing or invalid Authorization header" }
+    authenticated = AuthenticationHelper.authenticate!(request)
+    unless authenticated
+      render json: { error: "Unauthorized" }, status: :unauthorized
     end
   end
 

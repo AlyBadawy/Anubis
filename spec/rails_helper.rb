@@ -36,6 +36,7 @@ RSpec.configure do |config|
 
   config.before(:each) do
     @signed_in_user = create(:user)
+    @signed_in_user.roles << create(:role, role_name: "Admin")
     @signed_in_session = create(:session, user: @signed_in_user)
     @valid_token = JwtHelper.encode(@signed_in_session)
     @valid_headers = { "Authorization" => "Bearer #{@valid_token}" }

@@ -8,13 +8,13 @@ RSpec.describe Role, type: :model do
 
   describe "normalization" do
     it "normalizes role_name to titlecase" do
-      role = create(:role, role_name: "super admin")
-      expect(role.role_name).to eq("Super Admin")
+      role = create(:role, role_name: "super user")
+      expect(role.role_name).to eq("Super User")
     end
 
     it "strips whitespace from role_name" do
-      role = create(:role, role_name: "  admin  ")
-      expect(role.role_name).to eq("Admin")
+      role = create(:role, role_name: "  manager  ")
+      expect(role.role_name).to eq("Manager")
     end
   end
 
