@@ -13,11 +13,12 @@ Rails.application.routes.draw do
 
     scope "accounts" do
       get "me", to: "accounts#me", as: :me
-      get "profile/:username", to: "accounts#show", as: :profile_by_username
+      get "account/:username", to: "accounts#show", as: :profile_by_username
       post "register", to: "accounts#register", as: :register
-      # post "update_profile", to: "accounts#update_profile"
+      put "update", to: "accounts#update_profile", as: :update_profile
       # post "update_avatar", to: "accounts#update_avatar"
       # post "update_notification_settings", to: "accounts#update_notification_settings"
+      delete "delete_account", to: "accounts#delete_account", as: :delete_account
     end
 
     scope "sessions" do
