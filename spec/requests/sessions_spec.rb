@@ -106,4 +106,20 @@ RSpec.describe "/api/sessions", type: :request do
       end
     end
   end
+
+  describe "DELETE '/logout'" do
+    it "logs out the current user" do
+      Current.session = @signed_in_session
+      expect(Current.session).not_to be_nil
+      delete logout_url, headers: @valid_headers, as: :json
+      expect(response).to have_http_status(:no_content)
+      expect(Current.session).to be_nil
+    end
+
+    it "returns 401 unauthorized when no valid headers" do
+      delete logout_url, as: :json
+      expect(response).not_to be_successful
+      expect(response).to have_http_status(:unauthorized)
+    end
+  end
 end
