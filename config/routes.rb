@@ -13,7 +13,7 @@ Rails.application.routes.draw do
 
     scope "accounts" do
       get "me", to: "accounts#me", as: :me
-      get "account/:username", to: "accounts#show", as: :profile_by_username
+      get "account/:username", to: "accounts#show", as: :account_by_username
       post "register", to: "accounts#register", as: :register
       put "update", to: "accounts#update_profile", as: :update_profile
       # post "update_avatar", to: "accounts#update_avatar"
