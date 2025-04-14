@@ -18,7 +18,7 @@ RSpec.describe SessionsController, type: :routing do
       expect(post: "/api/sessions/login").to route_to("sessions#login", format: default_format)
     end
 
-    xit "routes to #logout" do # rubocop:disable RSpec/PendingWithoutReason
+    it "routes to #logout" do
       expect(delete: "/api/sessions/logout").to route_to("sessions#logout", format: default_format)
     end
 

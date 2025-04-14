@@ -30,6 +30,9 @@ class SessionsController < ApplicationController
   end
 
   def logout
+    @session&.revoke!
+    Current.session = nil if @session == Current.session
+    head :no_content
   end
 
   def refresh
