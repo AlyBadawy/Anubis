@@ -1,7 +1,7 @@
 FactoryBot.define do
   factory :session do
     ip_address { "127.0.0.1" }
-    user_agent { "RSpec" }
+    user_agent { "Ruby/RSpec" }
     refresh_count { 1 }
     refresh_token { SecureRandom.hex(64) }
     last_refreshed_at { Time.current }

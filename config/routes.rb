@@ -27,9 +27,9 @@ Rails.application.routes.draw do
       get "id/:id", to: "sessions#show", as: :session
       post "login", to: "sessions#login", as: :login
       delete "logout", to: "sessions#logout", as: :logout
-      # put "refresh", to: "sessions#refresh", as: :refresh_session
-      # delete "revoke", to: "sessions#revoke", as: :revoke_session
-      # delete "revoke_all", to: "sessions#revoke_all", as: :revoke_all_sessions
+      put "refresh", to: "sessions#refresh", as: :refresh_session
+      delete "revoke", to: "sessions#revoke", as: :revoke_session
+      delete "revoke_all", to: "sessions#revoke_all", as: :revoke_all_sessions
     end
 
     scope "password" do

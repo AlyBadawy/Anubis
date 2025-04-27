@@ -1,7 +1,7 @@
 class SessionsController < ApplicationController
-  skip_authentication! only: [:login]
+  skip_authentication! only: %i[login refresh]
 
-  before_action :set_session, only: %i[show logout]
+  before_action :set_session, only: %i[show revoke logout]
 
   def index
     @sessions = Current.user&.sessions || []
@@ -36,12 +36,33 @@ class SessionsController < ApplicationController
   end
 
   def refresh
+    if Current.session = Session.find_by(refresh_token: params[:refresh_token])
+      if Current.session.is_valid_session? &&
+         Current.session.ip_address == request.ip &&
+         Current.session.user_agent == request.user_agent
+        Current.session.refresh!
+        render status: :created,
+               json: {
+                 access_token: create_jwt_for_current_session,
+                 refresh_token: Current.session.refresh_token,
+                 refresh_token_expires_at: Current.session.refresh_token_expires_at,
+               }
+        return
+      end
+    end
+    render status: :unprocessable_entity, json: { error: "Invalid or expired token." }
   end
 
   def revoke
+    @session&.revoke!
+    Current.session = nil if @session == Current.session
+    head :no_content
   end
 
-  def revoke_All
+  def revoke_all
+    Current.user&.sessions.each(&:revoke!)
+    Current.session = nil
+    head :no_content
   end
 
   private

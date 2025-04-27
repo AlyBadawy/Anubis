@@ -38,7 +38,7 @@ RSpec.configure do |config|
     @signed_in_user = create(:user)
     @signed_in_session = create(:session, user: @signed_in_user)
     @valid_token = JwtHelper.encode(@signed_in_session)
-    @valid_headers = { "Authorization" => "Bearer #{@valid_token}" }
+    @valid_headers = { "Authorization" => "Bearer #{@valid_token}", "User-Agent" => "Ruby/RSpec" }
     @invalid_headers = { "Authorization" => "Bearer bad_token" }
   end
 end
