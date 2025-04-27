@@ -35,11 +35,8 @@ class AccountsController < ApplicationController
   def delete_account
     @user = Current.user
     if @user.authenticate(params[:user][:current_password])
-      if @user.destroy
-        render json: { message: "Account deleted successfully" }, status: :ok
-      else
-        render json: { errors: @user.errors.full_messages }, status: :unprocessable_entity
-      end
+      @user.destroy
+      render json: { message: "Account deleted successfully" }, status: :ok
     else
       render json: { error: "Current password is incorrect" }, status: :unprocessable_entity
     end

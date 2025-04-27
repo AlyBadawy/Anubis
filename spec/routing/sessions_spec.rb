@@ -22,15 +22,15 @@ RSpec.describe SessionsController, type: :routing do
       expect(delete: "/api/sessions/logout").to route_to("sessions#logout", format: default_format)
     end
 
-    xit "routes to #refresh" do # rubocop:disable RSpec/PendingWithoutReason
+    it "routes to #refresh" do # rubocop:disable RSpec/PendingWithoutReason
       expect(put: "/api/sessions/refresh").to route_to("sessions#refresh", format: default_format)
     end
 
-    xit "routes to #revoke" do # rubocop:disable RSpec/PendingWithoutReason
+    it "routes to #revoke" do # rubocop:disable RSpec/PendingWithoutReason
       expect(delete: "/api/sessions/revoke").to route_to("sessions#revoke", format: default_format)
     end
 
-    xit "routes to #revoke_all" do # rubocop:disable RSpec/PendingWithoutReason
+    it "routes to #revoke_all" do # rubocop:disable RSpec/PendingWithoutReason
       expect(delete: "/api/sessions/revoke_all").to route_to("sessions#revoke_all", format: default_format)
     end
   end
