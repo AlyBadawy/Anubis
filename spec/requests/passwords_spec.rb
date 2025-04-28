@@ -88,8 +88,9 @@ RSpec.describe "/passwords", type: :request do
 
     context "when Incorrect token for a user is provided" do
       it "renders a unprocessable_entity response" do
-        put reset_password_url("invalid_token"),
+        put reset_password_url,
             params: {
+              token: "invalid_token",
               password: "new_password",
               password_confirmation: "new_password",
             }
