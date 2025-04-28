@@ -22,7 +22,7 @@ class PasswordsController < ApplicationController
 
   def set_user_by_password_token
     @user = User.find_by_password_reset_token!(params[:token]) # rubocop:disable Rails/DynamicFindBy
-  rescue ActiveSupport::MessageVerifier::InvalidSignature
+  rescue ActiveSupport::MessageVerifier::InvalidSignature, ActiveRecord::RecordNotFound
     render status: :unprocessable_entity, json: { errors: { token: "is invalid or has expired" } }
   end
 end
