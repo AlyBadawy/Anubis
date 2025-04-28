@@ -107,8 +107,9 @@ RSpec.describe "/passwords", type: :request do
             password: "password",
           )
         ).to eq(@signed_in_user)
-        put reset_password_url("invalid_token"),
+        put reset_password_url,
             params: {
+              token: "invalid_token",
               password: "new_password",
               password_confirmation: "new_password",
             }
