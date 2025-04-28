@@ -34,7 +34,7 @@ class User < ApplicationRecord
   # Examples of Valid Emails:
   #   - user@example.com
   #   - user.name+tag@example.co.uk
-  #   - user123 @subdomain.example.com
+  #   - user123@subdomain.example.com
 
   VALID_USERNAME_REGEX = /\A(?![0-9])[a-zA-Z](?:[a-zA-Z0-9]|[._](?![._]))*[a-zA-Z0-9]\z/
 
