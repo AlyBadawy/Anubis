@@ -7,7 +7,7 @@ RSpec.describe Role, type: :model do
   end
 
   describe "normalization" do
-    it "normalizes role_name to titlecase" do
+    it "normalizes role_name to title case" do
       role = create(:role, role_name: "super admin")
       expect(role.role_name).to eq("Super Admin")
     end

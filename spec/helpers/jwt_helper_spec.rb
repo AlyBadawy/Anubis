@@ -3,26 +3,81 @@ require "rails_helper"
 RSpec.describe JwtHelper, type: :helper do
   let(:session) { create(:session) }
 
-  describe ".encode" do
+  describe "The .encode class method" do
     context "with a valid session" do
-      it "returns a JWT token" do
+      it "returns a JWT token for that session" do
         token = described_class.encode(session)
         expect(token).not_to be_nil
         expect(token).to be_a(String)
+      end
+
+      it "includes the session ID in the token payload" do
+        token = described_class.encode(session)
+        decoded_payload = JWT::EncodedToken.new(token).payload
+        expect(decoded_payload["jti"]).to eq(session.id)
       end
     end
 
     context "with an invalid session" do
       it "returns nil" do
-        token = described_class.encode(nil)
+        token = described_class.encode("Invalid session")
         expect(token).to be_nil
       end
     end
   end
 
-  describe ".decode" do
+  describe "The .decode class method" do
     context "with a valid token" do
       it "returns the decoded payload" do
+        token = described_class.encode(session)
+        decoded_payload = described_class.decode(token)
+        expect(decoded_payload).to be_a(Hash)
+      end
+
+      it "includes the session ID in the decoded payload" do
+        token = described_class.encode(session)
+        decoded_payload = described_class.decode(token)
+        expect(decoded_payload["jti"]).to eq(session.id)
+      end
+
+      it "includes the session refresh count in the decoded payload" do
+        token = described_class.encode(session)
+        decoded_payload = described_class.decode(token)
+        expect(decoded_payload["refresh_count"]).to eq(session.refresh_count)
+      end
+
+      it "includes the session IP address in the decoded payload" do
+        token = described_class.encode(session)
+        decoded_payload = described_class.decode(token)
+        expect(decoded_payload["ip"]).to eq(session.ip_address)
+      end
+
+      it "includes the session user agent in the decoded payload" do
+        token = described_class.encode(session)
+        decoded_payload = described_class.decode(token)
+        expect(decoded_payload["agent"]).to eq(session.user_agent)
+      end
+
+      it "includes the expiration time in the decoded payload" do
+        token = described_class.encode(session)
+        decoded_payload = described_class.decode(token)
+        expect(decoded_payload["exp"]).to be_within(1.second).of(3.minutes.from_now.to_i)
+      end
+
+      it "includes the correct keys for the payload" do
+        token = described_class.encode(session)
+        decoded_payload = described_class.decode(token)
+        expect(decoded_payload.keys).to include(
+          "jti",
+          "exp",
+          "sub",
+          "refresh_count",
+          "ip",
+          "agent",
+        )
+      end
+
+      it "includes the correct values for the payload" do
         token = described_class.encode(session)
         decoded_payload = described_class.decode(token)
         expect(decoded_payload).to include(

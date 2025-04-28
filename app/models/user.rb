@@ -1,15 +1,42 @@
 class User < ApplicationRecord
   has_secure_password
 
-  # \A - Start of string
-  # (?![0-9]) - Negative lookahead to prevent starting with a digit
-  # [a-zA-Z] - Must start with a letter
-  # (?:[a-zA-Z0-9]|._)* - Can contain letters, numbers, dots, or underscores, but dots and underscores cannot be consecutive
-  # [a-zA-Z0-9] - Must end with a letter or number
-  # \z - End of string
-  VALID_USERNAME_REGEX = /\A(?![0-9])[a-zA-Z](?:[a-zA-Z0-9]|[._](?![._]))*[a-zA-Z0-9]\z/
+  VALID_EMAIL_REGEX = URI::MailTo::EMAIL_REGEXP
+  # URI::MailTo::EMAIL_REGEXP - Regex for validating email addresses
+  # /\A[a-zA-Z0-9.!\#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*\z/
 
-  VALID_EMAIL_REGEX = /\A[\w+\-.]+@[a-z\d\-]+(\.[a-z\d\-]+)*\.[a-z]+\z/i
+  # \A - Start of string
+  #
+  # [a-zA-Z0-9.!#$%&'*+\/=?^_{|}~-]+`: One or more characters that can be:
+  #  Letters (a-z, A-Z)
+  #  Numbers (0-9)
+  #  Special characters: .!#$%&'*+/=?^_\{|}~-`
+  #
+  # @ - At sign: Literal @ character
+  #
+  # Domain Part (after @):
+  # [a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?
+  #   [a-zA-Z0-9]: Starts with a letter or number
+  #   (?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?: Optional group that can contain:
+  #       Up to 61 characters of alphanumeric or hyphens
+  #       Must end with alphanumeric
+  #
+  # Multiple Subdomains:
+  # (?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*
+  #   Matches zero or more occurrences of:
+  #   A dot followed by a domain part (same as above)
+  #   Ensures the string ends with a valid domain part
+  #   This regex allows for subdomains and top-level domains (TLDs)
+  #
+  #   \z - End of string
+
+  # This regex is used to validate email addresses in the User model.
+  # Examples of Valid Emails:
+  #   - user@example.com
+  #   - user.name+tag@example.co.uk
+  #   - user123@subdomain.example.com
+
+  VALID_USERNAME_REGEX = /\A(?![0-9])[a-zA-Z](?:[a-zA-Z0-9]|[._](?![._]))*[a-zA-Z0-9]\z/
 
   normalizes :email_address, with: ->(e) { e.strip.downcase }
   validates :email_address,

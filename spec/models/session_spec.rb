@@ -3,8 +3,10 @@ RSpec.describe Session, type: :model do
   let(:user) { create(:user) }
   let(:session) { create(:session, user: user) }
 
-  describe "associations" do
-    it { is_expected.to belong_to(:user) }
+  describe "factory" do
+    it "has a valid factory" do
+      expect(build(:session)).to be_valid
+    end
   end
 
   describe "validations" do
@@ -13,14 +15,18 @@ RSpec.describe Session, type: :model do
     it { is_expected.to validate_presence_of(:refresh_token) }
   end
 
-  describe "#revoke!" do
+  describe "associations" do
+    it { is_expected.to belong_to(:user) }
+  end
+
+  describe "The #revoke! instance method" do
     it "sets revoked to true" do
       session.revoke!
       expect(session.reload.revoked).to be true
     end
   end
 
-  describe "#is_valid_session?" do
+  describe "The #is_valid_session? instance method" do
     context "when the session is not revoked and not expired" do
       it "returns true" do
         expect(session.is_valid_session?).to be true
@@ -42,11 +48,69 @@ RSpec.describe Session, type: :model do
     end
   end
 
-  describe "#refresh!" do
-    it "updates last_refreshed_at and increments refresh_count" do
-      expect {
-        session.refresh!
-      }.to change { session.reload.last_refreshed_at }.and change { session.reload.refresh_count }.by(1)
+  describe "The #refresh! instance method" do
+    context "when the session is valid" do
+      it "does not raise an error" do
+        expect { session.refresh! }.not_to raise_error
+      end
+
+      it "updates the refresh_token and refresh_token_expires_at" do
+        expect {
+          session.refresh!
+        }.to change { session.reload.refresh_token }.and change { session.reload.refresh_token_expires_at }.to (be_within(1.second).of(1.week.from_now))
+      end
+
+      it "increments the refresh_count" do
+        expect {
+          session.refresh!
+        }.to change { session.reload.refresh_count }.by(1)
+      end
+
+      it "updates the last_refreshed_at" do
+        expect {
+          session.refresh!
+        }.to change { session.reload.last_refreshed_at }.to be_within(1.second).of(Time.current)
+      end
+
+      it "does not change the revoked status" do
+        expect {
+          session.refresh!
+        }.not_to change { session.reload.revoked }
+      end
+
+      it "does not change the user agent" do
+        expect {
+          session.refresh!
+        }.not_to change { session.reload.user_agent }
+      end
+
+      it "does not change the IP address" do
+        expect {
+          session.refresh!
+        }.not_to change { session.reload.ip_address }
+      end
+
+      it "does not change the user" do
+        expect {
+          session.refresh!
+        }.not_to change { session.reload.user }
+      end
+    end
+
+    context "when the session is revoked" do
+      before { session.revoke! }
+
+      it "raises an error" do
+        expect { session.refresh! }.to raise_error("Session is revoked")
+      end
+    end
+
+    context "when the session is expired" do
+      before { session.update!(refresh_token_expires_at: 1.minute.ago) }
+
+      it "raises an error" do
+        expect { session.refresh! }.to raise_error("Session is expired")
+      end
     end
   end
 end
