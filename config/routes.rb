@@ -33,9 +33,8 @@ Rails.application.routes.draw do
     end
 
     scope "password" do
-      # post "forgot_password", to: "accounts#forgot_password"
-      # post "reset_password", to: "accounts#reset_password"
-      # post "update_password", to: "accounts#update_password"
+      post "forgot", to: "passwords#forgot_password", as: :forgot_password
+      put "reset", to: "passwords#reset_password", as: :reset_password
     end
   end
 
