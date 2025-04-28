@@ -1,5 +1,5 @@
 class PasswordsMailer < ApplicationMailer
-  default from: ENV.fetch("EMAIL_FROM_ADDRESS") { "no-reply@exmaple.com" }
+  default from: ENV.fetch("EMAIL_FROM_ADDRESS") { "no-reply@example.com" }
 
   def reset(user)
     @user = user
