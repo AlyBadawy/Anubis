@@ -14,6 +14,13 @@ class Session < ApplicationRecord
   end
 
   def refresh!
-    update!(last_refreshed_at: Time.current, refresh_count: self.refresh_count + 1)
+    raise Anubis::SessionErrors::SessionRevokedError, "Session is revoked" if revoked
+    raise Anubis::SessionErrors::SessionExpiredError, "Session is expired" if refresh_token_expires_at < Time.current
+    raise Anubis::SessionErrors::SessionInvalidError, "Session is invalid" unless is_valid_session?
+
+    update!(refresh_token: SecureRandom.hex(64),
+            last_refreshed_at: Time.current,
+            refresh_token_expires_at: 1.week.from_now,
+            refresh_count: self.refresh_count + 1)
   end
 end

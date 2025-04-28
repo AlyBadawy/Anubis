@@ -31,6 +31,11 @@ RSpec.describe Identity, type: :request do
       it "returns an unauthorized response" do
         get "/test", headers: { "Authorization" => "Bearer invalid.token" }, as: :json
         expect(response).to have_http_status(:unauthorized)
+      end
+
+      it "returns JSON error message of Invalid encoding" do
+        get "/test", headers: { "Authorization" => "Bearer invalid token" }, as: :json
+
         expect(JSON.parse(response.body)).to include("error" => "Invalid token: Invalid segment encoding")
       end
     end
@@ -39,6 +44,10 @@ RSpec.describe Identity, type: :request do
       it "returns an unauthorized response" do
         get "/test", as: :json
         expect(response).to have_http_status(:unauthorized)
+      end
+
+      it "returns JSON error message of Missing or invalid Authorization header" do
+        get "/test", as: :json
         expect(JSON.parse(response.body)).to include("error" => "Missing or invalid Authorization header")
       end
     end

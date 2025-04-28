@@ -1,0 +1,383 @@
+
+ApplicationController
+  Rescuing from ActiveRecord::RecordNotFound
+    when visiting a route that raises ActiveRecord::RecordNotFound
+      returns a 404 not found response
+      returns a JSON error message of record not found
+  Rescuing from ActionController::ParameterMissing
+    when visiting a route that raises ActionController::ParameterMissing
+      returns a 400 bad request response
+      returns a JSON error message of bad request
+
+Identity
+  GET /test
+    with a valid token
+      returns a successful response
+    with an invalid token
+      returns an unauthorized response
+      returns JSON error message of Invalid encoding
+    with a missing token
+      returns an unauthorized response
+      returns JSON error message of Missing or invalid Authorization header
+
+JwtHelper
+  The .encode class method
+    with a valid session
+      returns a JWT token for that session
+      includes the session ID in the token payload
+    with an invalid session
+      returns nil
+  The .decode class method
+    with a valid token
+      returns the decoded payload
+      includes the session ID in the decoded payload
+      includes the session refresh count in the decoded payload
+      includes the session IP address in the decoded payload
+      includes the session user agent in the decoded payload
+      includes the expiration time in the decoded payload
+      includes the correct keys for the payload
+      includes the correct values for the payload
+    with an invalid token
+      raises a JWT::DecodeError
+    with an expired token
+      raises a JWT::ExpiredSignature
+
+PasswordsMailer
+  #reset
+    renders the correct headers [to, from, subject]
+    renders the mail message body
+
+RoleAssignment
+  Associations
+    is expected to belong to role required: true
+    is expected to belong to user required: true
+  factory
+    has a valid factory
+
+Role
+  validations
+    is expected to validate that :role_name cannot be empty/falsy
+    is expected to validate that :role_name is case-sensitively unique
+  normalization
+    normalizes role_name to title case
+    strips whitespace from role_name
+  factory
+    has a valid factory
+    creates an admin role
+    creates a user role
+  Associations
+    is expected to have many role_assignments dependent => destroy
+    is expected to have many users through role_assignments
+
+Session
+  factory
+    has a valid factory
+  validations
+    is expected to validate that :ip_address cannot be empty/falsy
+    is expected to validate that :user_agent cannot be empty/falsy
+    is expected to validate that :refresh_token cannot be empty/falsy
+  associations
+    is expected to belong to user required: true
+  The #revoke! instance method
+    sets revoked to true
+  The #is_valid_session? instance method
+    when the session is not revoked and not expired
+      returns true
+    when the session is revoked
+      returns false
+    when the session is expired
+      returns false
+  The #refresh! instance method
+    when the session is valid
+      does not raise an error
+      updates the refresh_token and refresh_token_expires_at
+      increments the refresh_count
+      updates the last_refreshed_at
+      does not change the revoked status
+      does not change the user agent
+      does not change the IP address
+      does not change the user
+    when the session is revoked
+      raises an error
+    when the session is expired
+      raises an error
+
+User
+  factory
+    has a valid factory
+  validations
+    Email Address Validations
+      is expected to validate that :email_address cannot be empty/falsy
+      is expected to validate that the length of :email_address is at least 5
+      is expected to validate that the length of :email_address is at most 255
+      is expected to validate that :email_address is case-insensitively unique
+    Username Validations
+      is expected to validate that :username cannot be empty/falsy
+      is expected to validate that :username is case-insensitively unique
+      is expected to validate that the length of :username is at most 20
+    Username Format Validations
+      is expected to allow :username to be ‹"valid_username"›
+      is expected to allow :username to be ‹"valid.username"›
+      is expected to allow :username to be ‹"valid_username123"›
+      is expected to allow :username to be ‹"valid_username_123"›
+      is expected to allow :username to be ‹"valid.username_123"›
+      is expected not to allow :username to be ‹"123username"›
+      is expected not to allow :username to be ‹"valid__username"›
+      is expected not to allow :username to be ‹"valid..username"›
+      is expected not to allow :username to be ‹"valid__username."›
+      is expected not to allow :username to be ‹"valid.username__"›
+      is expected not to allow :username to be ‹"valid.username__123"›
+      is expected not to allow :username to be ‹"valid.username__123_"›
+      is expected not to allow :username to be ‹"valid.username__123."›
+      is expected not to allow :username to be ‹"valid.username__123_456"›
+      is expected not to allow :username to be ‹"valid.username__123_456."›
+      is expected not to allow :username to be ‹"valid.username__123_456_"›
+      is expected not to allow :username to be ‹"valid.username__123_456_789"›
+    First/Last name validations
+      is expected to validate that :first_name cannot be empty/falsy
+      is expected to validate that the length of :first_name is at most 50
+      is expected to validate that :last_name cannot be empty/falsy
+      is expected to validate that the length of :last_name is at most 50
+    Other validations
+      is expected to validate that the length of :phone is at most 15
+      is expected to validate that the length of :bio is at most 1000
+  Associations
+    is expected to have many role_assignments dependent => destroy
+    is expected to have many roles through role_assignments
+    is expected to have many sessions dependent => destroy
+  normalizations
+    normalizes email address
+  password encryption
+    encrypts the password
+    does not store the password in plain text
+  authentication
+    has secure password
+    authenticate user by password
+
+AccountsController
+  /accounts
+    GET '/me'
+      when user is logged in
+        returns a successful response
+        returns the current user
+      when the user is not logged in
+        returns an unauthorized response
+        returns an error message
+        does not return the user profile
+    GET 'account/:username'
+      when username exists
+        renders a successful response
+        renders the user profile
+      when username does not exist
+        renders a not found response
+        renders an error message
+        does not render the user profile
+    POST /register
+      with valid parameters
+        creates a new User
+        renders a JSON response with the new user
+      with invalid parameters
+        does not create a new User
+        renders a JSON response with errors for the new user
+    PUT '/update'
+      with a valid current password
+        with valid parameters
+          updates the requested user
+          renders a JSON response with the updated user
+          returns the updated user
+        with invalid parameters
+          renders a JSON response with errors for the user
+          does not update the user
+      with invalid current password
+        renders a JSON response with an error message
+        does not update the user
+    Delete '/delete_account'
+      with valid current password
+        deletes the user
+        renders a JSON response with a success message
+      with invalid current password
+        renders a JSON response with an error message
+        does not delete the user
+
+PasswordsController
+  /passwords
+    POST /forgot
+      Always shows a successful response
+      Send an email if the user exists
+      Doesn't send an email if the user doesn't exist
+    PUT /passwords
+      when Correct token for a user is provided
+        renders a successful response
+        resets the password when password is valid
+        doesn't reset the password when password is invalid
+      when Incorrect token for a user is provided
+        renders a unprocessable_entity response
+        Doesn't reset the password
+
+RoleAssignmentsController
+  /admin/role_assignments
+    POST /create
+      with valid parameters
+        creates a new RoleAssignment
+        renders a JSON response with the user object
+      with invalid parameters
+        does not create a new RoleAssignment
+        renders a JSON response with errors for the new role_assignment
+        when user_id is nil
+          returns an error
+        when role_id is nil
+          returns an error
+        when role_id is not a valid role
+          returns an error
+        when user_id is not a valid user
+          returns an error
+        when role is already assigned to user
+          returns an error
+    DELETE /destroy
+      with valid parameters
+        revoke the Role from the User
+        renders a JSON response with the user object
+      with invalid parameters
+        does not revoke a role
+        renders a JSON response with errors for the new role_assignment
+        when user_id is nil
+          returns an error
+        when role_id is nil
+          returns an error
+        when role_id is not a valid role
+          returns an error
+        when user_id is not a valid user
+          returns an error
+        when role is not already assigned to user
+          returns an error
+
+RolesController
+  /admin/roles
+    GET /index
+      renders a successful response
+    GET /show
+      renders a successful response
+    POST /create
+      with valid parameters
+        creates a new Role
+        renders a JSON response with the new role
+      with invalid parameters
+        does not create a new Role
+        renders a JSON response with errors for the new role
+    PATCH /update
+      with valid parameters
+        updates the requested role
+        renders a JSON response with the role
+      with invalid parameters
+        renders a JSON response with errors for the role
+    DELETE /destroy
+      destroys the requested role
+
+SessionsController
+  /sessions
+    GET '/'
+      lists all sessions for the current user
+      return 401 unauthorized when no valid headers
+    GET '/current'
+      shows the session for current session (get session)
+      return 401 unauthorized when no valid headers
+    GET '/id/:id'
+      shows the session for a given ID (get sessions/:id)
+      shows 404 not found for the wrong session ID (get sessions/:id)
+    POST '/login'
+      with valid parameters
+        signs in the user and returns tokens
+      with invalid parameters
+        returns unauthorized status
+    DELETE '/logout'
+      logs out the current user
+      returns 401 unauthorized when no valid headers
+    PUT /refresh
+      refreshes the session
+      returns 422 unprocessable entity when session is invalid
+    DELETE /revoke
+      revokes the current session
+      returns 401 unauthorized when no valid headers
+      returns 404 not found when session ID is invalid
+      returns 401 unauthorized when session is already revoked
+    DELETE /revoke_all
+      revokes all sessions for the current user
+      returns 401 unauthorized when no valid headers
+
+UsersController
+  /admin/users
+    GET /index
+      renders a successful response
+    GET /show
+      renders a successful response
+      doesn't renders password_digest in the user object
+    POST /create
+      with valid parameters
+        creates a new User
+        renders a JSON response with the new user
+      with invalid parameters
+        does not create a new User
+        renders a JSON response with errors for the new user
+    PATCH /update
+      with valid parameters
+        updates the requested user
+        renders a JSON response with the user
+      with invalid parameters
+        renders a JSON response with errors for the user
+    DELETE /destroy
+      destroys the requested user
+
+AccountsController
+  routing
+    routes to #me
+    routes to #show
+    routes to #register
+    routes to #update_profile
+    routes to #delete_account
+
+PasswordsController
+  routing
+    routes to #forgot
+    routes to #reset
+
+RoleAssignmentsController
+  routing
+    routes to #create
+    routes to #destroy
+
+RolesController
+  routing
+    routes to #index
+    routes to #show
+    routes to #create
+    routes to #update via PUT
+    routes to #update via PATCH
+    routes to #destroy
+
+SessionsController
+  routing
+    routes to #index
+    routes to #show
+    routes to #login
+    routes to #logout
+    routes to #refresh
+    routes to #revoke
+    routes to #revoke_all
+
+UsersController
+  routing
+    routes to #index
+    routes to #show
+    routes to #create
+    routes to #update via PUT
+    routes to #update via PATCH
+    routes to #destroy
+
+Test
+  Passes
+
+Finished in 2.31 seconds (files took 1.07 seconds to load)
+213 examples, 0 failures
+
+Coverage report generated for RSpec to /Users/alybadawy/GitHub/templates/Anubis/coverage.
+Line Coverage: 99.7% (330 / 331)
