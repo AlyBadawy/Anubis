@@ -23,8 +23,10 @@ RSpec.describe UsersController, type: :request do
       }
     }
 
-    let(:valid_headers) {
-      {}
+    let(:expected_keys) {
+      %w[
+        id first_name last_name phone username bio roles created_at updated_at url
+      ]
     }
 
     describe "GET /index" do
@@ -32,6 +34,15 @@ RSpec.describe UsersController, type: :request do
         User.create! valid_attributes
         get users_url, headers: @valid_headers, as: :json
         expect(response).to be_successful
+      end
+
+      it "renders a JSON response with all users as an array" do
+        get users_url, headers: @valid_headers, as: :json
+        expect(response.content_type).to match(a_string_including("application/json"))
+        res_body = JSON.parse(response.body)
+        expect(res_body).to be_an(Array)
+        expect(res_body.length).to eq(1)
+        expect(res_body[0]["username"]).to eq(@signed_in_user.username)
       end
     end
 
@@ -42,14 +53,27 @@ RSpec.describe UsersController, type: :request do
         expect(response).to be_successful
       end
 
+      it "renders a JSON response of the user with correct keys" do
+        user = User.create! valid_attributes
+        get user_url(user), headers: @valid_headers, as: :json
+        expect(response.content_type).to match(a_string_including("application/json"))
+        res_body = JSON.parse(response.body)
+        expect(res_body.keys).to include(*expected_keys)
+      end
+
+      it "doesn't render the email address in the user object (for privacy)" do
+        user = User.create! valid_attributes
+        get user_url(user), headers: @valid_headers, as: :json
+        response_body = JSON.parse(response.body)
+        expect(response_body.keys).not_to include("email_address")
+      end
+
       it "doesn't renders password_digest in the user object" do
         user = User.create! valid_attributes
         get user_url(user), headers: @valid_headers, as: :json
         response_body = JSON.parse(response.body)
         expect(response_body.keys).not_to include("password_digest")
-        expect(response_body.keys).to include(
-          "id", "first_name", "last_name", "phone", "username", "bio", "url"
-        )
+        expect(response_body.keys).to include(*expected_keys)
       end
     end
 
@@ -133,6 +157,12 @@ RSpec.describe UsersController, type: :request do
         expect {
           delete user_url(user), headers: @valid_headers, as: :json
         }.to change(User, :count).by(-1)
+      end
+
+      it "returns a 204 no content response" do
+        user = User.create! valid_attributes
+        delete user_url(user), headers: @valid_headers, as: :json
+        expect(response).to have_http_status(:no_content)
       end
     end
   end

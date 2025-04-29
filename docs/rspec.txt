@@ -159,6 +159,7 @@ AccountsController
     GET '/me'
       when user is logged in
         returns a successful response
+        returns a JSON response with the correct keys
         returns the current user
       when the user is not logged in
         returns an unauthorized response
@@ -167,6 +168,7 @@ AccountsController
     GET 'account/:username'
       when username exists
         renders a successful response
+        renders a JSON response with the correct keys
         renders the user profile
       when username does not exist
         renders a not found response
@@ -203,12 +205,15 @@ PasswordsController
   /passwords
     POST /forgot
       Always shows a successful response
-      Send an email if the user exists
-      Doesn't send an email if the user doesn't exist
+      when the user exists
+        Send an email
+      when the user doesn't exist
+        Doesn't send an email
     PUT /passwords
       when Correct token for a user is provided
         renders a successful response
         resets the password when password is valid
+        doesn't reset the password when password is blank
         doesn't reset the password when password is invalid
       when Incorrect token for a user is provided
         renders a unprocessable_entity response
@@ -255,8 +260,11 @@ RolesController
   /admin/roles
     GET /index
       renders a successful response
+      renders a JSON response with all roles as an array
+      renders an empty array when no roles to display
     GET /show
       renders a successful response
+      renders a JSON response of the role with correct keys
     POST /create
       with valid parameters
         creates a new Role
@@ -272,6 +280,7 @@ RolesController
         renders a JSON response with errors for the role
     DELETE /destroy
       destroys the requested role
+      renders a no_content response
 
 SessionsController
   /sessions
@@ -290,8 +299,11 @@ SessionsController
       with invalid parameters
         returns unauthorized status
     DELETE '/logout'
-      logs out the current user
-      returns 401 unauthorized when no valid headers
+      when user is signed in
+        logs out the current user
+        returns 204 no content
+      when user is not signed in (no valid headers)
+        returns 401 unauthorized when no valid headers
     PUT /refresh
       refreshes the session
       returns 422 unprocessable entity when session is invalid
@@ -300,16 +312,26 @@ SessionsController
       returns 401 unauthorized when no valid headers
       returns 404 not found when session ID is invalid
       returns 401 unauthorized when session is already revoked
-    DELETE /revoke_all
-      revokes all sessions for the current user
+    DELETE /id/:id/revoke
+      revokes a session by ID
+      returns 404 not found when session ID is invalid
       returns 401 unauthorized when no valid headers
+    DELETE /revoke_all
+      when user is signed in
+        revokes all sessions for the current user
+        returns 204 no content
+      when user is not signed in (no valid headers)
+        returns 401 unauthorized when no valid headers
 
 UsersController
   /admin/users
     GET /index
       renders a successful response
+      renders a JSON response with all users as an array
     GET /show
       renders a successful response
+      renders a JSON response of the user with correct keys
+      doesn't render the email address in the user object (for privacy)
       doesn't renders password_digest in the user object
     POST /create
       with valid parameters
@@ -326,58 +348,60 @@ UsersController
         renders a JSON response with errors for the user
     DELETE /destroy
       destroys the requested user
+      returns a 204 no content response
 
 AccountsController
   routing
-    routes to #me
-    routes to #show
-    routes to #register
-    routes to #update_profile
-    routes to #delete_account
+    routes to GET '/api/accounts/me' for current user account
+    routes to GET '/api/accounts/account/cool_user' to get user profile by username
+    routes to POST '/api/accounts/register' to register a new account
+    routes to PUT '/api/accounts/update' to update current user's profile
+    routes to DELETE '/api/accounts/delete_account' to delete current user's account
 
 PasswordsController
   routing
-    routes to #forgot
-    routes to #reset
+    routes to POST '/api/password/forgot' to get a password reset token
+    routes to PUT '/api/password/reset' to reset the password using a reset token
 
 RoleAssignmentsController
   routing
-    routes to #create
-    routes to #destroy
+    routes to POST '/api/admin/role_assignments/assign' to assign a role to user
+    routes to DELETE '/api/admin/role_assignments/revoke' to revoke a role from user
 
 RolesController
   routing
-    routes to #index
-    routes to #show
-    routes to #create
-    routes to #update via PUT
-    routes to #update via PATCH
-    routes to #destroy
+    routes to GET '/api/admin/roles' to get all roles
+    routes to GET '/api/admin/roles/1' to get a role by Id
+    routes to POST '/api/admin/roles' to create a role
+    routes to PUT '/api/admin/roles/1' to update a role by Id
+    routes to PATCH '/api/admin/roles/1' to update a role by Id
+    routes to DELETE '/api/admin/roles/1' to delete a role by Id
 
 SessionsController
   routing
-    routes to #index
-    routes to #show
-    routes to #login
-    routes to #logout
-    routes to #refresh
-    routes to #revoke
-    routes to #revoke_all
+    routes to GET '/api/sessions' to get all sessions of current user
+    routes to GET '/api/sessions/current' to get current session
+    routes to GET '/api/sessions/id/123' to get session by Id
+    routes to POST '/api/sessions/login' to login
+    routes to DELETE '/api/sessions/logout' to logout the user
+    routes to POST '/api/sessions/refresh' to refresh the session
+    routes to POST '/api/sessions/revoke' to revoke the session
+    routes to DELETE '/api/sessions/id/1/revoke' to revoke a session by Id
+    routes to POST '/api/sessions/revoke_all' to revoke all sessions of current user
 
 UsersController
   routing
-    routes to #index
-    routes to #show
-    routes to #create
-    routes to #update via PUT
-    routes to #update via PATCH
-    routes to #destroy
+    routes to GET '/api/admin/users' to get all users
+    routes to GET '/api/admin/users/1' to get a user by Id
+    routes to POST '/api/admin/users' to create a user
+    routes to PUT '/api/admin/users/1' to update a user by Id
+    routes to PATCH '/api/admin/users/1' to update a user by Id
+    routes to DELETE '/api/admin/users/1' to delete a user by Id
 
 Test
   Passes
 
-Finished in 2.31 seconds (files took 1.07 seconds to load)
-213 examples, 0 failures
+Finished in 2.83 seconds (files took 1.08 seconds to load)
+231 examples, 0 failures
 
-Coverage report generated for RSpec to /Users/alybadawy/GitHub/templates/Anubis/coverage.
-Line Coverage: 99.7% (330 / 331)
+Line Coverage: 99.7% (336 / 337)

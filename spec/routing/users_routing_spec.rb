@@ -4,27 +4,27 @@ RSpec.describe UsersController, type: :routing do
   let(:default_format) { :json }
 
   describe "routing" do
-    it "routes to #index" do
+    it "routes to GET '/api/admin/users' to get all users" do
       expect(get: "/api/admin/users").to route_to("users#index", format: default_format)
     end
 
-    it "routes to #show" do
+    it "routes to GET '/api/admin/users/1' to get a user by Id" do
       expect(get: "/api/admin/users/1").to route_to("users#show", id: "1", format: default_format)
     end
 
-    it "routes to #create" do
+    it "routes to POST '/api/admin/users' to create a user" do
       expect(post: "/api/admin/users").to route_to("users#create", format: default_format)
     end
 
-    it "routes to #update via PUT" do
+    it "routes to PUT '/api/admin/users/1' to update a user by Id" do
       expect(put: "/api/admin/users/1").to route_to("users#update", id: "1", format: default_format)
     end
 
-    it "routes to #update via PATCH" do
+    it "routes to PATCH '/api/admin/users/1' to update a user by Id" do
       expect(patch: "/api/admin/users/1").to route_to("users#update", id: "1", format: default_format)
     end
 
-    it "routes to #destroy" do
+    it "routes to DELETE '/api/admin/users/1' to delete a user by Id" do
       expect(delete: "/api/admin/users/1").to route_to("users#destroy", id: "1", format: default_format)
     end
   end

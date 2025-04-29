@@ -11,7 +11,7 @@ class PasswordsController < ApplicationController
   end
 
   def reset_password
-    if @user.update(params.permit(:password, :password_confirmation))
+    if params.require(:password_confirmation) && @user.update(params.permit(:password, :password_confirmation))
       render status: :ok, json: { message: "Password has been reset." }
     else
       render status: :unprocessable_entity, json: { errors: @user.errors }
@@ -21,8 +21,8 @@ class PasswordsController < ApplicationController
   private
 
   def set_user_by_password_token
-    @user = User.find_by_password_reset_token!(params[:token]) # rubocop:disable Rails/DynamicFindBy
+    @user = User.find_by_password_reset_token!(params[:password_reset_token]) # rubocop:disable Rails/DynamicFindBy
   rescue ActiveSupport::MessageVerifier::InvalidSignature, ActiveRecord::RecordNotFound
-    render status: :unprocessable_entity, json: { errors: { token: "is invalid or has expired" } }
+    render status: :unprocessable_entity, json: { errors: { password_reset_token: "is invalid or has expired" } }
   end
 end

@@ -19,6 +19,24 @@ RSpec.describe RolesController, type: :request do
         get roles_url, headers: @valid_headers, as: :json
         expect(response).to be_successful
       end
+
+      it "renders a JSON response with all roles as an array" do
+        Role.create! valid_attributes
+        get roles_url, headers: @valid_headers, as: :json
+        expect(response.content_type).to match(a_string_including("application/json"))
+        res_body = JSON.parse(response.body)
+        expect(res_body).to be_an(Array)
+        expect(res_body.length).to eq(1)
+        expect(res_body[0]["role_name"]).to eq("Admin")
+        expect(res_body[0]["hide_from_profile"]).to be(true)
+      end
+
+      it "renders an empty array when no roles to display" do
+        get roles_url, headers: @valid_headers, as: :json
+        expect(response.content_type).to match(a_string_including("application/json"))
+        res_body = JSON.parse(response.body)
+        expect(res_body.length).to eq(0)
+      end
     end
 
     describe "GET /show" do
@@ -26,6 +44,14 @@ RSpec.describe RolesController, type: :request do
         role = Role.create! valid_attributes
         get role_url(role), as: :json, headers: @valid_headers
         expect(response).to be_successful
+      end
+
+      it "renders a JSON response of the role with correct keys" do
+        role = Role.create! valid_attributes
+        get role_url(role), as: :json, headers: @valid_headers
+        expect(response.content_type).to match(a_string_including("application/json"))
+        res_body = JSON.parse(response.body)
+        expect(res_body.keys).to eq(%w[id role_name hide_from_profile created_at updated_at url])
       end
     end
 
@@ -110,6 +136,12 @@ RSpec.describe RolesController, type: :request do
         expect {
           delete role_url(role), headers: @valid_headers, as: :json
         }.to change(Role, :count).by(-1)
+      end
+
+      it "renders a no_content response" do
+        role = Role.create! valid_attributes
+        delete role_url(role), headers: @valid_headers, as: :json
+        expect(response).to have_http_status(:no_content)
       end
     end
   end

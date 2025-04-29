@@ -22,6 +22,10 @@ RSpec.describe AccountsController, type: :request do
     }
   }
 
+  let(:expected_keys) {
+    %w[id first_name last_name phone username bio roles created_at updated_at url]
+  }
+
   describe "/accounts" do
     describe "GET '/me'" do
       context "when user is logged in" do
@@ -30,10 +34,17 @@ RSpec.describe AccountsController, type: :request do
           expect(response).to have_http_status(:ok)
         end
 
+        it "returns a JSON response with the correct keys" do
+          get me_url, headers: @valid_headers
+          expect(response.content_type).to match(a_string_including("application/json"))
+          res_body = JSON.parse(response.body)
+
+          expect(res_body.keys).to include(*expected_keys)
+        end
+
         it "returns the current user" do
           get me_url, headers: @valid_headers
           res_body = JSON.parse(response.body)
-          expected_keys = ["id", "first_name", "last_name", "phone", "username", "bio", "roles", "created_at", "updated_at", "url"]
           expect(res_body.keys).to include(*expected_keys)
           expect(res_body["username"]).to eq(@signed_in_user.username)
           expect(res_body["roles"]).to be_an(Array)
@@ -72,12 +83,18 @@ RSpec.describe AccountsController, type: :request do
           expect(response).to be_successful
         end
 
+        it "renders a JSON response with the correct keys" do
+          create(:user, username: "testUser1")
+          get account_by_username_url("testUser1"), as: :json, headers: @valid_headers
+          res_body = JSON.parse(response.body)
+
+          expect(res_body.keys).to include(*expected_keys)
+        end
+
         it "renders the user profile" do
           create(:user, username: "testUser2")
           get account_by_username_url("testUser2"), as: :json, headers: @valid_headers
           res_body = JSON.parse(response.body)
-          expected_keys = ["id", "first_name", "last_name", "phone", "username", "bio", "roles", "created_at", "updated_at", "url"]
-          expect(res_body.keys).to include(*expected_keys)
           expect(res_body["username"]).to eq("testUser2")
           expect(res_body["roles"]).to be_an(Array)
           expect(res_body["roles"].length).to eq(0)
@@ -124,6 +141,9 @@ RSpec.describe AccountsController, type: :request do
                params: { user: valid_attributes }, headers: @valid_headers, as: :json
           expect(response).to have_http_status(:created)
           expect(response.content_type).to match(a_string_including("application/json"))
+          res_body = JSON.parse(response.body)
+
+          expect(res_body.keys).to include(*expected_keys)
         end
       end
 
@@ -166,7 +186,6 @@ RSpec.describe AccountsController, type: :request do
             put update_profile_url,
                 params: { user: { current_password: "password", first_name: "Updated", last_name: "Three" } }, headers: @valid_headers, as: :json
             res_body = JSON.parse(response.body)
-            expected_keys = ["id", "first_name", "last_name", "phone", "username", "bio", "roles", "created_at", "updated_at", "url"]
             expect(res_body.keys).to include(*expected_keys)
             expect(res_body["first_name"]).to eq("Updated")
             expect(res_body["last_name"]).to eq("Three")

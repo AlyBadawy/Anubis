@@ -13,16 +13,20 @@ RSpec.describe PasswordsController, type: :request do
         )
       end
 
-      it "Send an email if the user exists" do
-        allow(PasswordsMailer).to receive(:reset).and_call_original
-        post forgot_password_url, params: { email_address: @signed_in_user.email_address }
-        expect(PasswordsMailer).to have_received(:reset).with(@signed_in_user).exactly(1)
+      context "when the user exists" do
+        it "Send an email" do
+          allow(PasswordsMailer).to receive(:reset).and_call_original
+          post forgot_password_url, params: { email_address: @signed_in_user.email_address }
+          expect(PasswordsMailer).to have_received(:reset).with(@signed_in_user).exactly(1)
+        end
       end
 
-      it "Doesn't send an email if the user doesn't exist" do
-        allow(PasswordsMailer).to receive(:reset).and_call_original
-        post forgot_password_url, params: { email_address: "wrong@email.com" }
-        expect(PasswordsMailer).to have_received(:reset).with(@signed_in_user).exactly(0)
+      context "when the user doesn't exist" do
+        it "Doesn't send an email" do
+          allow(PasswordsMailer).to receive(:reset).and_call_original
+          post forgot_password_url, params: { email_address: "wrong@email.com" }
+          expect(PasswordsMailer).to have_received(:reset).with(@signed_in_user).exactly(0)
+        end
       end
     end
 
@@ -31,7 +35,7 @@ RSpec.describe PasswordsController, type: :request do
         it "renders a successful response" do
           token = @signed_in_user.password_reset_token
           put reset_password_url, params: {
-                                    token: token,
+                                    password_reset_token: token,
                                     password: "new_password",
                                     password_confirmation: "new_password",
                                   }
@@ -47,7 +51,7 @@ RSpec.describe PasswordsController, type: :request do
           ).to be_nil
           token = @signed_in_user.password_reset_token
           put reset_password_url, params: {
-                                    token: token,
+                                    password_reset_token: token,
                                     password: "new_password",
                                     password_confirmation: "new_password",
                                   }
@@ -62,6 +66,29 @@ RSpec.describe PasswordsController, type: :request do
           ).to eq(@signed_in_user)
         end
 
+        it "doesn't reset the password when password is blank" do
+          expect(
+            User.authenticate_by(
+              email_address: @signed_in_user.email_address,
+              password: "new_password",
+            )
+          ).to be_nil
+          token = @signed_in_user.password_reset_token
+          put reset_password_url, params: {
+                                    password_reset_token: token,
+                                    password: "new_password",
+                                  }
+          expect(JSON.parse(response.body)).to eq(
+            { "error" => "param is missing or the value is empty or invalid: password_confirmation" }
+          )
+          expect(
+            User.authenticate_by(
+              email_address: @signed_in_user.email_address,
+              password: "new_password",
+            )
+          ).to be_nil
+        end
+
         it "doesn't reset the password when password is invalid" do
           expect(
             User.authenticate_by(
@@ -71,7 +98,7 @@ RSpec.describe PasswordsController, type: :request do
           ).to be_nil
           token = @signed_in_user.password_reset_token
           put reset_password_url, params: {
-                                    token: token,
+                                    password_reset_token: token,
                                     password: "new_password",
                                     password_confirmation: "incorrect",
                                   }
@@ -91,13 +118,13 @@ RSpec.describe PasswordsController, type: :request do
         it "renders a unprocessable_entity response" do
           put reset_password_url,
               params: {
-                token: "invalid_token",
+                password_reset_token: "invalid_token",
                 password: "new_password",
                 password_confirmation: "new_password",
               }
           expect(response).to have_http_status(:unprocessable_entity)
           expect(JSON.parse(response.body)).to eq(
-            { "errors" => { "token" => "is invalid or has expired" } }
+            { "errors" => { "password_reset_token" => "is invalid or has expired" } }
           )
         end
 
@@ -110,7 +137,7 @@ RSpec.describe PasswordsController, type: :request do
           ).to eq(@signed_in_user)
           put reset_password_url,
               params: {
-                token: "invalid_token",
+                password_reset_token: "invalid_token",
                 password: "new_password",
                 password_confirmation: "new_password",
               }

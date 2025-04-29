@@ -109,18 +109,28 @@ RSpec.describe SessionsController, type: :request do
     end
 
     describe "DELETE '/logout'" do
-      it "logs out the current user" do
-        Current.session = @signed_in_session
-        expect(Current.session).not_to be_nil
-        delete logout_url, headers: @valid_headers, as: :json
-        expect(response).to have_http_status(:no_content)
-        expect(Current.session).to be_nil
+      context "when user is signed in" do
+        it "logs out the current user" do
+          Current.session = @signed_in_session
+          expect(Current.session).not_to be_nil
+          delete logout_url, headers: @valid_headers, as: :json
+          expect(Current.session).to be_nil
+        end
+
+        it "returns 204 no content" do
+          Current.session = @signed_in_session
+          expect(Current.session).not_to be_nil
+          delete logout_url, headers: @valid_headers, as: :json
+          expect(response).to have_http_status(:no_content)
+        end
       end
 
-      it "returns 401 unauthorized when no valid headers" do
-        delete logout_url, as: :json
-        expect(response).not_to be_successful
-        expect(response).to have_http_status(:unauthorized)
+      context "when user is not signed in (no valid headers)" do
+        it "returns 401 unauthorized when no valid headers" do
+          delete logout_url, as: :json
+          expect(response).not_to be_successful
+          expect(response).to have_http_status(:unauthorized)
+        end
       end
     end
 
@@ -151,13 +161,13 @@ RSpec.describe SessionsController, type: :request do
       it "revokes the current session" do
         Current.session = @signed_in_session
         expect(Current.session).not_to be_nil
-        delete revoke_session_url, headers: @valid_headers, as: :json
+        delete revoke_current_session_url, headers: @valid_headers, as: :json
         expect(response).to have_http_status(:no_content)
         expect(Current.session).to be_nil
       end
 
       it "returns 401 unauthorized when no valid headers" do
-        delete revoke_session_url, as: :json
+        delete revoke_current_session_url, as: :json
         expect(response).not_to be_successful
         expect(response).to have_http_status(:unauthorized)
       end
@@ -165,7 +175,7 @@ RSpec.describe SessionsController, type: :request do
       it "returns 404 not found when session ID is invalid" do
         Current.session = @signed_in_session
         expect(Current.session).not_to be_nil
-        delete revoke_session_url(id: "invalid"), headers: @valid_headers, as: :json
+        delete revoke_current_session_url(id: "invalid"), headers: @valid_headers, as: :json
         expect(response).not_to be_successful
         expect(response).to have_http_status(:not_found)
       end
@@ -174,25 +184,57 @@ RSpec.describe SessionsController, type: :request do
         Current.session = @signed_in_session
         expect(Current.session).not_to be_nil
         Current.session.revoke!
-        delete revoke_session_url, headers: @valid_headers, as: :json
+        delete revoke_current_session_url, headers: @valid_headers, as: :json
+        expect(response).not_to be_successful
+        expect(response).to have_http_status(:unauthorized)
+      end
+    end
+
+    describe "DELETE /id/:id/revoke" do
+      it "revokes a session by ID" do
+        new_session = create(:session, user: @signed_in_user)
+        expect(new_session).not_to be_nil
+        delete revoke_session_by_id_url(new_session), headers: @valid_headers, as: :json
+        expect(response).to have_http_status(:no_content)
+        expect(Session.find_by(id: new_session.id)).to be_revoked
+      end
+
+      it "returns 404 not found when session ID is invalid" do
+        delete revoke_session_by_id_url(id: "invalid"), headers: @valid_headers, as: :json
+        expect(response).not_to be_successful
+        expect(response).to have_http_status(:not_found)
+      end
+
+      it "returns 401 unauthorized when no valid headers" do
+        delete revoke_session_by_id_url(id: "invalid"), as: :json
         expect(response).not_to be_successful
         expect(response).to have_http_status(:unauthorized)
       end
     end
 
     describe "DELETE /revoke_all" do
-      it "revokes all sessions for the current user" do
-        Current.session = @signed_in_session
-        expect(Current.session).not_to be_nil
-        delete revoke_all_sessions_url, headers: @valid_headers, as: :json
-        expect(response).to have_http_status(:no_content)
-        expect(Current.session).to be_nil
+      context "when user is signed in" do
+        it "revokes all sessions for the current user" do
+          Current.session = @signed_in_session
+          expect(Current.session).not_to be_nil
+          delete revoke_all_sessions_url, headers: @valid_headers, as: :json
+          expect(Current.session).to be_nil
+        end
+
+        it "returns 204 no content" do
+          Current.session = @signed_in_session
+          expect(Current.session).not_to be_nil
+          delete revoke_all_sessions_url, headers: @valid_headers, as: :json
+          expect(response).to have_http_status(:no_content)
+        end
       end
 
-      it "returns 401 unauthorized when no valid headers" do
-        delete revoke_all_sessions_url, as: :json
-        expect(response).not_to be_successful
-        expect(response).to have_http_status(:unauthorized)
+      context "when user is not signed in (no valid headers)" do
+        it "returns 401 unauthorized when no valid headers" do
+          delete revoke_all_sessions_url, as: :json
+          expect(response).not_to be_successful
+          expect(response).to have_http_status(:unauthorized)
+        end
       end
     end
   end
