@@ -24,11 +24,11 @@ RSpec.describe SessionsController, type: :routing do
       expect(delete: "/api/sessions/logout").to route_to("sessions#logout", format: default_format)
     end
 
-    it "routes to POST '/api/sessions/refresh' to refresh the session" do
+    it "routes to PUT '/api/sessions/refresh' to refresh the session" do
       expect(put: "/api/sessions/refresh").to route_to("sessions#refresh", format: default_format)
     end
 
-    it "routes to POST '/api/sessions/revoke' to revoke the session" do
+    it "routes to DELETE '/api/sessions/revoke' to revoke the session" do
       expect(delete: "/api/sessions/revoke").to route_to("sessions#revoke", format: default_format)
     end
 
@@ -36,7 +36,7 @@ RSpec.describe SessionsController, type: :routing do
       expect(delete: "/api/sessions/id/1/revoke").to route_to("sessions#revoke", format: default_format, id: "1")
     end
 
-    it "routes to POST '/api/sessions/revoke_all' to revoke all sessions of current user" do
+    it "routes to DELETE '/api/sessions/revoke_all' to revoke all sessions of current user" do
       expect(delete: "/api/sessions/revoke_all").to route_to("sessions#revoke_all", format: default_format)
     end
   end

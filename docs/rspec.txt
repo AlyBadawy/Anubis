@@ -213,7 +213,7 @@ PasswordsController
       when Correct token for a user is provided
         renders a successful response
         resets the password when password is valid
-        doesn't reset the password when password is blank
+        doesn't reset the password when password_confirmation is blank
         doesn't reset the password when password is invalid
       when Incorrect token for a user is provided
         renders a unprocessable_entity response
@@ -384,10 +384,10 @@ SessionsController
     routes to GET '/api/sessions/id/123' to get session by Id
     routes to POST '/api/sessions/login' to login
     routes to DELETE '/api/sessions/logout' to logout the user
-    routes to POST '/api/sessions/refresh' to refresh the session
-    routes to POST '/api/sessions/revoke' to revoke the session
+    routes to PUT '/api/sessions/refresh' to refresh the session
+    routes to DELETE '/api/sessions/revoke' to revoke the session
     routes to DELETE '/api/sessions/id/1/revoke' to revoke a session by Id
-    routes to POST '/api/sessions/revoke_all' to revoke all sessions of current user
+    routes to DELETE '/api/sessions/revoke_all' to revoke all sessions of current user
 
 UsersController
   routing
@@ -401,7 +401,7 @@ UsersController
 Test
   Passes
 
-Finished in 2.83 seconds (files took 1.08 seconds to load)
+Finished in 2.41 seconds (files took 1.44 seconds to load)
 231 examples, 0 failures
 
 Line Coverage: 99.7% (336 / 337)

@@ -66,7 +66,7 @@ RSpec.describe PasswordsController, type: :request do
           ).to eq(@signed_in_user)
         end
 
-        it "doesn't reset the password when password is blank" do
+        it "doesn't reset the password when password_confirmation is blank" do
           expect(
             User.authenticate_by(
               email_address: @signed_in_user.email_address,
