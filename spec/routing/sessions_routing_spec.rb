@@ -12,7 +12,7 @@ RSpec.describe SessionsController, type: :routing do
       expect(get: "/api/sessions/current").to route_to("sessions#show", format: default_format)
     end
 
-    it "routes to GET '/api/sessions/id/123' to get session by Id" do
+    it "routes to GET '/api/sessions/id/123' to get session by ID" do
       expect(get: "/api/sessions/id/123").to route_to("sessions#show", format: default_format, id: "123")
     end
 
@@ -32,7 +32,7 @@ RSpec.describe SessionsController, type: :routing do
       expect(delete: "/api/sessions/revoke").to route_to("sessions#revoke", format: default_format)
     end
 
-    it "routes to DELETE '/api/sessions/id/1/revoke' to revoke a session by Id" do
+    it "routes to DELETE '/api/sessions/id/1/revoke' to revoke a session by ID" do
       expect(delete: "/api/sessions/id/1/revoke").to route_to("sessions#revoke", format: default_format, id: "1")
     end
 
