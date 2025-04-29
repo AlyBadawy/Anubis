@@ -9,7 +9,7 @@ RSpec.describe UsersController, type: :routing do
     end
 
     it "routes to GET '/api/admin/users/1' to get a user by ID" do
-      expect(get: "/api/admin/users/1").to route_to("users#show", iD: "1", format: default_format)
+      expect(get: "/api/admin/users/1").to route_to("users#show", id: "1", format: default_format)
     end
 
     it "routes to POST '/api/admin/users' to create a user" do
