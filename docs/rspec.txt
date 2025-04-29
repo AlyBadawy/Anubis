@@ -414,7 +414,7 @@ Failures:
        +{"format" => :json, "controller" => "users", "action" => "show", "id" => "1"}
      # ./spec/routing/users_routing_spec.rb:12:in 'block (3 levels) in <top (required)>'
 
-Finished in 2.35 seconds (files took 1.08 seconds to load)
+Finished in 2.35 seconds (files took 1.03 seconds to load)
 231 examples, 1 failure
 
 Failed examples:
